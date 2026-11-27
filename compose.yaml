@@ -1,0 +1,39 @@
+services:
+  app:
+    build: .
+    image: studylog-app:local
+    user: "${STUDYLOG_UID:-1000}"
+    environment:
+      PORT: '8000'
+      NODE_ENV: development
+      DATABASE_URL: "postgresql://studylog:${POSTGRES_PASSWORD:? .envにPOSTGRES_PASSWORDを設定してください}@db:5432/studylog?schema=public"
+      HTPASSWD_PATH: /etc/secrets/users.htpasswd
+    ports:
+      - "127.0.0.1:${STUDYLOG_PORT:-8000}:8000"
+    volumes:
+      - type: bind
+        source: ./users.htpasswd
+        target: /etc/secrets/users.htpasswd
+        read_only: true
+        bind:
+          create_host_path: false
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:16.16-bookworm
+    environment:
+      POSTGRES_USER: studylog
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:? .envにPOSTGRES_PASSWORDを設定してください}"
+      POSTGRES_DB: studylog
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-h", "127.0.0.1", "-U", "studylog", "-d", "studylog"]
+      interval: 2s
+      timeout: 3s
+      retries: 15
+
+volumes:
+  db-data:

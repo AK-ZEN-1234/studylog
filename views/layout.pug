@@ -1,0 +1,23 @@
+block variables
+
+doctype html
+html(lang="ja" data-bs-theme=theme)
+  head
+    meta(charset="utf-8")
+    meta(name="viewport" content="width=device-width, initial-scale=1")
+    title= title
+    link(rel="icon" href="/favicon.ico")
+    link(rel="stylesheet" href="/vendor/bootstrap.css")
+    link(rel="stylesheet" href="/vendor/bootstrap-icons.css")
+    link(rel="stylesheet" href="/style.css")
+    block scripts
+  body
+    header.app-header
+      nav.navbar.page-width(aria-label="メインナビゲーション")
+        a.navbar-brand.studylog-brand(href="/")
+          span.brand-icon
+            i.bi.bi-journal-text(aria-hidden="true")
+          | StudyLog
+        .nav-actions
+          block navigation
+    block main

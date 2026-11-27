@@ -1,0 +1,63 @@
+extends layout
+
+block variables
+  - var title = '学習記録｜StudyLog'
+
+block scripts
+  script(src="/vendor/bootstrap.js" defer)
+  script(src="/studylog.js" defer)
+
+block navigation
+  span.nav-account
+    i.bi.bi-person-circle(aria-hidden="true")
+    span= user
+  form(method="post" action="/theme")
+    input(type="hidden" name="csrfToken" value=csrfToken)
+    input(type="hidden" name="theme" value=theme === 'dark' ? 'light' : 'dark')
+    - const themeLabel = theme === 'dark' ? 'ライトモードに切り替える' : 'ダークモードに切り替える'
+    button.btn.btn-sm.btn-outline-secondary.nav-icon(type="submit" title=themeLabel aria-label=themeLabel)
+      i.bi(class=theme === 'dark' ? 'bi-sun' : 'bi-moon-stars' aria-hidden="true")
+  a.btn.btn-sm.btn-outline-secondary.nav-icon(href="/logout" title="ログアウト" aria-label="ログアウト")
+    i.bi.bi-box-arrow-right(aria-hidden="true")
+
+block main
+  main.journal.page-width
+    .journal-heading
+      h1 学習記録
+      a.btn.btn-sm.btn-outline-primary(href="/posts/export")
+        i.bi.bi-download.me-2(aria-hidden="true")
+        | Excel出力
+    section#post-feed.post-feed(aria-label="学習記録の一覧" tabindex="0")
+      if posts.length
+        each post in posts
+          article.card.post-card(class=post.postedBy === user ? 'post-own' : '')
+            .card-body
+              .post-header
+                .post-author
+                  strong= post.postedBy
+                  if post.postedBy === ADMIN
+                    span.badge.text-bg-warning 管理者
+                time.post-time.text-body-secondary(datetime=post.createdAt.toISOString() title=post.fullTime data-bs-toggle="tooltip" tabindex="0")= post.relativeTime
+              p.post-content= post.content
+              if user === ADMIN || user === post.postedBy
+                form.post-delete(method="post" action="/posts/delete")
+                  input(type="hidden" name="csrfToken" value=csrfToken)
+                  input(type="hidden" name="id" value=post.id)
+                  button.btn.btn-sm.btn-outline-danger(type="submit")
+                    i.bi.bi-trash3.me-1(aria-hidden="true")
+                    | 削除
+      else
+        .empty-feed
+          i.bi.bi-journal(aria-hidden="true")
+          p まだ学習記録がありません。
+    form#post-form.post-form(method="post" action="/posts")
+      input(type="hidden" name="csrfToken" value=csrfToken)
+      label.form-label.fw-semibold(for="content") 学習内容
+      textarea#content.form-control(name="content" rows="2" required placeholder="学んだことを書き留める" aria-describedby="content-count content-shortcut" data-max-length=MAX_CONTENT_LENGTH)
+      .form-actions
+        .form-hint
+          span#content-count= '0 / ' + MAX_CONTENT_LENGTH + '文字'
+          span#content-shortcut.d-none.d-sm-inline Ctrl / ⌘ + Enter
+        button.btn.btn-primary(type="submit")
+          i.bi.bi-send.me-2(aria-hidden="true")
+          | 投稿

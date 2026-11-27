@@ -1,0 +1,27 @@
+extends layout
+
+block variables
+  - var title = 'StudyLog｜学習記録を共有'
+
+block navigation
+  a.btn.btn-sm.btn-outline-secondary(href="/posts") 学習記録一覧
+
+block main
+  main.landing.page-width
+    .hero
+      .hero-copy
+        h1 今日の学びを、
+          br
+          | 記録しよう。
+        p 学習した内容や気づきを書き留めて、仲間と共有する学習記録アプリです。
+        a.btn.btn-primary.btn-lg(href="/posts")
+          i.bi.bi-journals.me-2(aria-hidden="true")
+          | 学習記録を見る
+      .hero-illustration(aria-hidden="true")
+        .notebook
+          i.bi.bi-journal-text
+          .notebook-line
+          .notebook-line
+          .notebook-line
+        span.illustration-pencil
+          i.bi.bi-pencil
